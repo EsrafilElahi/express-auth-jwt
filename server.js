@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const handleErrors = require("./middlewares/handleErrors");
 const setHeadersOrigin = require("./middlewares/setHeadersOrigin");
+const mongoose = require("mongoose");
 const registerRoute = require("./routes/register");
 const loginRoute = require("./routes/login");
 const connectDB = require("./database/db");
@@ -13,7 +14,6 @@ const app = express();
 const PORT = process.env.PROJECT_PORT || 5050;
 
 // middlewares
-connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -33,5 +33,6 @@ app.get("*", (req, res) => {
 });
 
 app.listen(PORT, () => {
+  connectDB();
   console.log(`server running on port ${PORT}`);
 });
