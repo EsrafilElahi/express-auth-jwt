@@ -1,27 +1,34 @@
 const express = require("express");
 const router = express.Router();
+const { validateRegister, validateLogin } = require("../middlewares/validation");
 const User = require("../models/user");
 
-router.post("/", (req, res) => {
-  const { name, email, password } = req.body;
+router.post("/", async (req, res) => {
+  const { name, email, password, passwordConfirm } = req.body;
+
+  // check validator
+  const error = validateRegister(req.body);
+  if (error) {
+    res.status(400).send("validate register error");
+  }
 
   // check user exists
-  // const existUser = User.findOne({ email: email });
-  // console.log("existUser :", existUser);
-  // if (existUser) {
-  //   res.status(400).send("Email Already Exist");
-  // }
+  const existUser = await User.findOne({ email: email });
+  if (existUser) {
+    res.status(400).send("Email Already Exist!");
+  }
 
   try {
     const savedUser = new User({
       name,
       email,
       password,
+      passwordConfirm,
     });
-    savedUser.save();
+    await savedUser.save();
     res.send(savedUser);
   } catch (error) {
-    res.status(400).json({ err: `error in 400 : ${error}` });
+    res.status(400).json({ err: `bad request register : ${error}` });
   }
 });
 
