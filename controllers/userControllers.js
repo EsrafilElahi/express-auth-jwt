@@ -3,6 +3,7 @@ const {
   validateLogin,
 } = require("../middlewares/validation");
 const User = require("../models/user");
+const customError = require("../middlewares/customError");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -95,8 +96,36 @@ const forgotPasswordController = async (req, res) => {
   }
 };
 
+const resetPasswordController = async (req, res) => {
+  const token = req.params.token;
+
+  // verify token and check it
+  const tokenUserId = jwt.verify(token, process.env.SECRET_KEY);
+  if (!tokenUserId) {
+    res.status(401).send("un authorized!");
+  }
+
+  // check password with passwordConfirm
+  if (req.body.password !== req.body.passwordConfirm) {
+    res.status(422).send("two passwords are not same!");
+  }
+
+  try {
+    const user = await User.findOne({ _id: tokenUserId });
+    if (!user) {
+      res.status(404).send("user not found!");
+    }
+    user.password = req.body.password;
+    await user.save();
+    res.status(200).send("password has been changed");
+  } catch (error) {
+    res.status(400).send("reset password is failed");
+  }
+};
+
 module.exports = {
   registerController,
   loginController,
   forgotPasswordController,
+  resetPasswordController,
 };
