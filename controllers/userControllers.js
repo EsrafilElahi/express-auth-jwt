@@ -58,7 +58,6 @@ const loginController = async (req, res) => {
   }
   // check password
   const validPassword = await bcrypt.compare(req.body.password, user.password);
-  console.log("user.password :", user.password);
   if (!validPassword) {
     res.status(400).send("email or password is wrong!");
   }
@@ -73,4 +72,31 @@ const loginController = async (req, res) => {
   }
 };
 
-module.exports = { registerController, loginController };
+const forgotPasswordController = async (req, res) => {
+  // check user exist
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    res.status(404).send("user not found!");
+  }
+
+  try {
+    // create and sign token to user
+    const token = jwt.sign({ _id: user._id }, process.env.SECRET_KEY, {
+      expiresIn: "1h",
+    });
+    const link = `http://localhost:${process.env.PROJECT_PORT}/users/forget-password/${token}`;
+
+    res.status(201).json({
+      resetPasswordLink: link,
+      msg: "rest password link is sent successfully",
+    });
+  } catch (error) {
+    res.status(400).send("failed jwt sign " + error);
+  }
+};
+
+module.exports = {
+  registerController,
+  loginController,
+  forgotPasswordController,
+};
