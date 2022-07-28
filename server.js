@@ -4,10 +4,10 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const handleErrors = require("./middlewares/handleErrors");
 const setHeadersOrigin = require("./middlewares/setHeadersOrigin");
-const mongoose = require("mongoose");
-const registerRoute = require("./routes/register");
-const loginRoute = require("./routes/login");
 const connectDB = require("./database/db");
+const authRoute = require("./routes/user");
+const postsRoute = require("./routes/posts");
+const authenticate = require("./middlewares/authenticate");
 dotenv.config();
 
 const app = express();
@@ -20,8 +20,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors({ origin: `http://localhost:${PORT}` }));
 app.use(setHeadersOrigin);
 app.use(handleErrors);
-app.use("/api/auth/register", registerRoute);
-app.use("/api/auth/login", loginRoute);
+app.use("/api/auth", authRoute);
+app.use("/posts", authenticate, postsRoute);
 
 // routes
 app.get("/", (req, res) => {
