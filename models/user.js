@@ -26,10 +26,10 @@ const UserSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true },
+  { timestamps: true }, // to build createdAt & updatedAt fields automatically 
   { collections: "users" }
 );
 
-// const UserModel =
+const UserModel = mongoose.model("User", UserSchema);
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = UserModel;

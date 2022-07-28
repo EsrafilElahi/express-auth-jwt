@@ -18,8 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors({ origin: `http://localhost:${PORT}` }));
-app.use(handleErrors);
 app.use(setHeadersOrigin);
+app.use(handleErrors);
 app.use("/api/auth/register", registerRoute);
 app.use("/api/auth/login", loginRoute);
 

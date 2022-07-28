@@ -1,7 +1,7 @@
 const express = require("express");
-const bcrypt = require('bcrypt');
 const { validateRegister, validateLogin } = require("../middlewares/validation");
 const User = require("../models/user");
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.post("/", async (req, res) => {
   // check validator
   const error = validateRegister(req.body);
   if (error) {
-    res.status(400).send("validate register error");
+    res.status(400).send("two passwords are not same!");
   }
 
   // check user exists
@@ -22,30 +22,25 @@ router.post("/", async (req, res) => {
 
   try {
     // hash password
-    const salt = bcrypt.genSalt(10);
-    const hashedPassword = bcrypt.hash(password, salt, (err, hash) => {
-      if (err) {
-        res.status(400).send("failed hash password")
-      }
-    })
-    const hashedConfirmPassword = bcrypt.hash(passwordConfirm, salt, (err, hash) => {
-      if (err) {
-        res.status(400).send("failed hash password")
-      }
-    })
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt)
+    const hashedConfirmPassword = await bcrypt.hash(passwordConfirm, salt)
 
     const savedUser = new User({
-      name,
-      email,
-      hashedPassword,
-      hashedConfirmPassword,
+      name: name,
+      email: email,
+      password: hashedPassword,
+      passwordConfirm: hashedConfirmPassword,
     });
 
     await savedUser.save();
-    res.send(savedUser);
+    res.status(201).send(savedUser);
+
   } catch (error) {
-    res.status(400).json({ err: `bad request register : ${error}` });
+    res.status(400).send("register user error " + error)
   }
+
+
 });
 
 module.exports = router;
