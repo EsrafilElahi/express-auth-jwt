@@ -1,7 +1,9 @@
 const express = require("express");
-const router = express.Router();
+const bcrypt = require('bcrypt');
 const { validateRegister, validateLogin } = require("../middlewares/validation");
 const User = require("../models/user");
+
+const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { name, email, password, passwordConfirm } = req.body;
@@ -19,12 +21,26 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // hash password
+    const salt = bcrypt.genSalt(10);
+    const hashedPassword = bcrypt.hash(password, salt, (err, hash) => {
+      if (err) {
+        res.status(400).send("failed hash password")
+      }
+    })
+    const hashedConfirmPassword = bcrypt.hash(passwordConfirm, salt, (err, hash) => {
+      if (err) {
+        res.status(400).send("failed hash password")
+      }
+    })
+
     const savedUser = new User({
       name,
       email,
-      password,
-      passwordConfirm,
+      hashedPassword,
+      hashedConfirmPassword,
     });
+
     await savedUser.save();
     res.send(savedUser);
   } catch (error) {
