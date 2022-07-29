@@ -3,7 +3,6 @@ const {
   validateLogin,
 } = require("../middlewares/validation");
 const User = require("../models/user");
-const customError = require("../middlewares/customError");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -32,6 +31,8 @@ const registerController = async (req, res) => {
     const savedUser = new User({
       name: req.body.name,
       email: req.body.email,
+      role: req.body.role,
+      courses: req.body.courses,
       password: hashedPassword,
       passwordConfirm: hashedConfirmPassword,
     });

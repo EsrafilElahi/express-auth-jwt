@@ -13,6 +13,15 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    role: {
+      type: String,
+      required: true,
+    },
+    courses: {
+      type: Array,
+      default: [],
+      required: true,
+    },
     password: {
       type: String,
       required: true,
@@ -26,7 +35,7 @@ const UserSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true }, // to build createdAt & updatedAt fields automatically 
+  { timestamps: true }, // to build createdAt & updatedAt fields automatically
   { collections: "users" }
 );
 
