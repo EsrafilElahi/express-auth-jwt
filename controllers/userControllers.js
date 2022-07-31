@@ -124,9 +124,26 @@ const resetPasswordController = async (req, res) => {
   }
 };
 
+const logoutController = async (req, res) => {
+  // const authHeader = req.headers["authorization"];
+  // const token = authHeader.split(" ")[1];
+  const token = req.header("Auth-Token");
+  if (token) {
+    res.status(401).send("not authorization!");
+  }
+
+  jwt.sign(token, "", { expiresIn: 1 }, (logout, err) => {
+    if (err) {
+      res.status(401).send("not logout");
+    }
+    res.status(200).send("logged out!");
+  });
+};
+
 module.exports = {
   registerController,
   loginController,
   forgotPasswordController,
   resetPasswordController,
+  logoutController,
 };
