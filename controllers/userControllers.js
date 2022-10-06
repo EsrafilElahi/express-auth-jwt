@@ -128,7 +128,7 @@ const logoutController = async (req, res) => {
   // const authHeader = req.headers["authorization"];
   // const token = authHeader.split(" ")[1];
   const token = req.header("Auth-Token");
-  if (token) {
+  if (!token) {
     res.status(401).send("not authorization!");
   }
 
